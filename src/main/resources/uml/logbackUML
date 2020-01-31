@@ -1,0 +1,109 @@
+@startuml
+    interface LoggerFactoryBinder {
+        + ILoggerFactory getLoggerFactory()
+    }
+    class StaticLoggerBinder {
+        - LoggerContext defaultLoggerContext
+    }
+    
+    interface PropertyContainer {
+        + String getProperty(String key)
+        + Map<String, String> getCopyOfPropertyMap()
+    }
+    
+    interface Context {
+        + StatusManager getStatusManager()
+        + Object getObject(String key)
+        + void putObject(String key, Object value)
+        + String getProperty(String key)
+        + void putProperty(String key, String value)
+        + Map<String, String> getCopyOfPropertyMap()
+        + String getName()
+        + void setName(String name)
+        + long getBirthTime()
+        + Object getConfigurationLock()
+        + ScheduledExecutorService getScheduledExecutorService()
+        + void register(LifeCycle component)
+        + void addScheduledFuture(ScheduledFuture<?> scheduledFuture)
+    }
+    
+    interface LifeCycle {
+        + void start()
+        + void stop()
+        + boolean isStarted()
+    }
+    
+    class ContextBase {
+        - long birthTime
+        - String name
+        - StatusManager sm
+        ~ Map<String, String> propertyMap
+        ~ Map<String, Object> objectMap
+        ~ LogbackLock configurationLock
+        - ScheduledExecutorService scheduledExecutorService
+        # List<ScheduledFuture<?>> scheduledFutures
+        - LifeCycleManager lifeCycleManager
+        - boolean started
+    }
+    
+    interface ILoggerFactory {
+        + Logger getLogger(String name)
+    }
+    
+    class LoggerContext {
+        ~ Logger root
+        - List<LoggerContextListener> loggerContextListenerList
+        - Map<String, Logger> loggerCache
+        - LoggerContextVO loggerContextRemoteView
+        - TurboFilterList turboFilterList
+        
+    }
+    
+    class Logger {
+        - String name
+        - Level level
+        - Logger parent
+        - List<Logger> childrenList
+        - AppenderAttachableImpl<ILoggingEvent> aai
+        ~ LoggerContext loggerContext
+    }
+    
+    interface org.slf4j.Logger {
+         + String getName()
+         + boolean isTraceEnabled()
+         + void trace(String msg)
+         + void trace(String format, Object arg)
+         + void trace(String format, Object arg1, Object arg2)
+         + void trace(String format, Object... arguments)
+         + void trace(String msg, Throwable t)
+    }
+    
+   interface AppenderAttachable<E> {
+         + void addAppender(Appender<E> newAppender)
+         + Iterator<Appender<E>> iteratorForAppenders()
+         + Appender<E> getAppender(String name)
+         + boolean isAttached(Appender<E> appender)
+         + void detachAndStopAllAppenders()
+         + boolean detachAppender(Appender<E> appender)
+         + boolean detachAppender(String name)
+   }
+   
+   class AppenderAttachableImpl<E> {
+        - COWArrayList<Appender<E>> appenderList
+   }
+   
+    
+    StaticLoggerBinder ..|> LoggerFactoryBinder
+    Context --|> PropertyContainer
+    LoggerContext --* StaticLoggerBinder
+    ContextBase ..|> Context
+    ContextBase ..|> LifeCycle
+    LoggerContext --|> ContextBase
+    LoggerContext ..|> ILoggerFactory
+    LoggerContext ..|> LifeCycle
+    Logger --* LoggerContext
+    Logger *-- LoggerContext
+    Logger ..|> org.slf4j.Logger
+    Logger ..|> AppenderAttachable
+    AppenderAttachableImpl ..|> AppenderAttachable
+@enduml

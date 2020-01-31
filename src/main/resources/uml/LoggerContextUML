@@ -1,0 +1,51 @@
+@startuml
+    interface Context {
+        + StatusManager getStatusManager()
+        + Object getObject(String key)
+        + void putObject(String key, Object value)
+        + String getProperty(String key)
+        + void putProperty(String key, String value)
+        + Map<String, String> getCopyOfPropertyMap()
+        + String getName()
+        + void setName(String name)
+        + ScheduledExecutorService getScheduledExecutorService()
+        + void register(LifeCycle component)
+        + void addScheduledFuture(ScheduledFuture<?> scheduledFuture)
+    }
+    
+    interface LifeCycle {
+        + void start()
+        + void stop()
+        + boolean isStarted()
+    }
+    
+    class ContextBase {
+        - String name
+        - StatusManager sm
+        ~ Map<String, String> propertyMap
+        ~ Map<String, Object> objectMap
+        - ScheduledExecutorService scheduledExecutorService
+        # List<ScheduledFuture<?>> scheduledFutures
+        - LifeCycleManager lifeCycleManager
+    }
+    
+    interface ILoggerFactory {
+        + Logger getLogger(String name)
+    }
+    
+    class LoggerContext {
+        ~ Logger root
+        - List<LoggerContextListener> loggerContextListenerList
+        - Map<String, Logger> loggerCache
+        - LoggerContextVO loggerContextRemoteView
+        - TurboFilterList turboFilterList
+        
+    }
+   
+    
+    ContextBase .up.|> Context
+    ContextBase .up.|> LifeCycle
+    LoggerContext -up-|> ContextBase
+    LoggerContext .up.|> ILoggerFactory
+    LoggerContext .up.|> LifeCycle
+@enduml

@@ -1,0 +1,49 @@
+@startuml
+interface Appender<E> {
+    + void doAppend(E event) throws LogbackException
+}
+
+
+abstract class UnsynchronizedAppenderBase<E> {
+    + void doAppend(E eventObject)
+    # {abstract} void append(E eventObject)
+    + void addFilter(Filter<E> newFilter)
+    + FilterReply getFilterChainDecision(E event)
+}
+
+class OutputStreamAppender<E> {
+    + void setOutputStream(OutputStream outputStream)
+    + void setEncoder(Encoder<E> encoder)
+}
+class ConsoleAppender<E> {
+    + void setTarget(String value) 
+}
+class FileAppender<E> {
+    + void setFile(String file)
+    + void setPrudent(boolean prudent)
+    + void setAppend(boolean append)
+}
+class RollingFileAppender<E> {
+    + void setRollingPolicy(RollingPolicy policy)
+    + void setTriggeringPolicy(TriggeringPolicy<E> policy)
+}
+
+abstract class Filter<E> {
+    + {abstract} FilterReply decide(E event)
+}
+
+Filter -left-* OutputStreamAppender
+
+interface Encoder<E> {
+    + byte[] encode(E event)
+}
+
+Encoder --right* OutputStreamAppender
+
+OutputStreamAppender -up-|> UnsynchronizedAppenderBase
+ConsoleAppender -up-|> OutputStreamAppender
+FileAppender -up-|> OutputStreamAppender
+RollingFileAppender -up-|> FileAppender
+
+UnsynchronizedAppenderBase .up.|> Appender
+@enduml

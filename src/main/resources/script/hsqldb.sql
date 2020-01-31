@@ -4,31 +4,43 @@
 # See http://logback.qos.ch/license.html for the applicable licensing 
 # conditions.
 
-# This SQL script creates the required tables by ch.qos.logback.access.db.DBAppender
+
+# This SQL script creates the required tables by ch.qos.logback.classic.db.DBAppender.
 #
-# It is intended for HSQL databases.
+# It is intended for HSQL databases. It has been tested on HSQL 1.8.07.
 
+DROP TABLE logging_event_exception IF EXISTS;
+DROP TABLE logging_event_property IF EXISTS;
+DROP TABLE logging_event IF EXISTS;
 
-DROP TABLE access_event_header IF EXISTS;
-DROP TABLE access_event IF EXISTS;
-
-CREATE TABLE access_event (
+CREATE TABLE logging_event (
   timestmp BIGINT NOT NULL,
-  requestURI VARCHAR(254),
-  requestURL VARCHAR(254),
-  remoteHost VARCHAR(254),
-  remoteUser VARCHAR(254),
-  remoteAddr VARCHAR(254),
-  protocol VARCHAR(254),
-  method VARCHAR(254),
-  serverName VARCHAR(254),
-  postContent VARCHAR(254),
+  formatted_message LONGVARCHAR NOT NULL,
+  logger_name VARCHAR(256) NOT NULL,
+  level_string VARCHAR(256) NOT NULL,
+  thread_name VARCHAR(256),
+  reference_flag SMALLINT,
+  arg0 VARCHAR(256),
+  arg1 VARCHAR(256),
+  arg2 VARCHAR(256),
+  arg3 VARCHAR(256),
+  caller_filename VARCHAR(256), 
+  caller_class VARCHAR(256), 
+  caller_method VARCHAR(256), 
+  caller_line CHAR(4),
   event_id BIGINT NOT NULL IDENTITY);
 
 
-CREATE TABLE access_event_header (
+CREATE TABLE logging_event_property (
   event_id BIGINT NOT NULL,
-  header_key  VARCHAR(254) NOT NULL,
-  header_value LONGVARCHAR,
-  PRIMARY KEY(event_id, header_key),
-  FOREIGN KEY (event_id) REFERENCES access_event(event_id));
+  mapped_key  VARCHAR(254) NOT NULL,
+  mapped_value LONGVARCHAR,
+  PRIMARY KEY(event_id, mapped_key),
+  FOREIGN KEY (event_id) REFERENCES logging_event(event_id));
+
+CREATE TABLE logging_event_exception (
+  event_id BIGINT NOT NULL,
+  i SMALLINT NOT NULL,
+  trace_line VARCHAR(256) NOT NULL,
+  PRIMARY KEY(event_id, i),
+  FOREIGN KEY (event_id) REFERENCES logging_event(event_id));

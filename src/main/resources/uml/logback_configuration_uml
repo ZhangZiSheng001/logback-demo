@@ -1,0 +1,68 @@
+@startuml
+    class SaxEventRecorder {
+        + List<SaxEvent> saxEventList
+    }
+    class DefaultHandler
+    interface EntityResolver
+    interface DTDHandler
+    interface ContentHandler
+    interface ErrorHandler
+    DefaultHandler .up.|> EntityResolver
+    DefaultHandler .up.|> DTDHandler
+    DefaultHandler .up.|> ContentHandler
+    DefaultHandler .up.|> ErrorHandler
+    SaxEventRecorder -up-|> DefaultHandler
+    
+    class SaxEvent 
+    class StartEvent
+    class EndEvent
+    class BodyEvent
+    StartEvent -up-|> SaxEvent
+    BodyEvent -up-|> SaxEvent
+    EndEvent -up-|> SaxEvent
+    
+    interface RuleStore {
+        + void addRule(ElementSelector elementSelector, Action action)
+        + List<Action> matchActions(ElementPath elementPath)
+    }
+    class SimpleRuleStore {
+        ~ HashMap<ElementSelector, List<Action>> rules
+    }
+    SimpleRuleStore .up.|> RuleStore
+    
+    abstract class Action {
+        + {abstract} void begin(InterpretationContext ic, String name, Attributes attributes)
+        + void body(InterpretationContext ic, String body)
+        + {abstract} void end(InterpretationContext ic, String name)
+    }
+    
+    class AppenderAction<E>
+    class ConfigurationAction
+    class LoggerAction
+    class RootLoggerAction
+    class PropertyAction
+    AppenderAction -up-|> Action
+    ConfigurationAction -up-|> Action
+    LoggerAction -up-|> Action
+    RootLoggerAction -up-|> Action
+    PropertyAction -up-|> Action
+    
+    
+    Action -down-* SimpleRuleStore
+    
+    SaxEvent -right-* SaxEventRecorder
+    
+    class Interpreter {
+        ~ private RuleStore ruleStore
+        ~ EventPlayer eventPlayer
+    }
+    
+    RuleStore -up-* Interpreter
+    class EventPlayer {
+        ~ Interpreter interpreter
+        ~ List<SaxEvent> eventList
+    }
+    EventPlayer -up-* Interpreter
+    Interpreter -up-* EventPlayer
+    SaxEvent -left-*EventPlayer
+@enduml

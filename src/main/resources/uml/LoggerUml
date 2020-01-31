@@ -1,0 +1,43 @@
+@startuml
+    
+    class Logger {
+        - String name
+        - Level level
+        - Logger parent
+        - List<Logger> childrenList
+        - AppenderAttachableImpl<ILoggingEvent> aai
+        ~ LoggerContext loggerContext
+    }
+    
+    interface org.slf4j.Logger {
+         + String getName()
+         + boolean isTraceEnabled()
+         + void trace(String msg)
+         + void trace(String format, Object arg)
+         + void trace(String format, Object arg1, Object arg2)
+         + void trace(String format, Object... arguments)
+         + void trace(String msg, Throwable t)
+    }
+    
+   interface AppenderAttachable<E> {
+         + void addAppender(Appender<E> newAppender)
+         + Iterator<Appender<E>> iteratorForAppenders()
+         + Appender<E> getAppender(String name)
+         + boolean isAttached(Appender<E> appender)
+         + void detachAndStopAllAppenders()
+         + boolean detachAppender(Appender<E> appender)
+         + boolean detachAppender(String name)
+   }
+   
+   class AppenderAttachableImpl<E> {
+        - COWArrayList<Appender<E>> appenderList
+   }
+   
+    
+    Logger -left-* LoggerContext
+    Logger *-right- LoggerContext
+    Logger .up.|> org.slf4j.Logger
+    Logger .up.|> AppenderAttachable
+    AppenderAttachableImpl .up.|> AppenderAttachable
+    AppenderAttachableImpl -left-* Logger
+@enduml

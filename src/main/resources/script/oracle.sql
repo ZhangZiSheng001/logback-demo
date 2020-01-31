@@ -4,51 +4,75 @@
 -- See http://logback.qos.ch/license.html for the applicable licensing 
 -- conditions.
 
--- This SQL script creates the required tables by ch.qos.logback.access.db.DBAppender
+
+-- This SQL script creates the required tables by ch.qos.logback.classic.db.DBAppender
 --
--- It is intended for Oracle databases.
+-- It is intended for Oracle 9i, 10g and 11g databases. Tested on version 9.2, 
+-- 10g and 11g.
+
+-- The following lines are useful in cleaning any previously existing tables 
+
+--drop TRIGGER logging_event_id_seq_trig; 
+--drop SEQUENCE logging_event_id_seq; 
+--drop table logging_event_property; 
+--drop table logging_event_exception; 
+--drop table logging_event; 
 
 
-CREATE SEQUENCE access_event_id_seq MINVALUE 1 START WITH 1;
+CREATE SEQUENCE logging_event_id_seq MINVALUE 1 START WITH 1;
 
-
-CREATE TABLE access_event 
+CREATE TABLE logging_event 
   (
-    timestmp          NUMBER(20) NOT NULL,
-    requestURI    VARCHAR(254),
-    requestURL        VARCHAR(254),
-    remoteHost        VARCHAR(254),
-    remoteUser        VARCHAR(254),
-    remoteAddr        VARCHAR(254),
-    protocol          VARCHAR(254),
-    method            VARCHAR(254),
-    serverName        VARCHAR(254),
-    postContent       VARCHAR(254),
-    event_id          NUMBER(20) PRIMARY KEY
+    timestmp         NUMBER(20) NOT NULL,
+    formatted_message  VARCHAR2(4000) NOT NULL,
+    logger_name       VARCHAR(254) NOT NULL,
+    level_string      VARCHAR(254) NOT NULL,
+    thread_name       VARCHAR(254),
+    reference_flag    SMALLINT,
+    arg0              VARCHAR(254),
+    arg1              VARCHAR(254),
+    arg2              VARCHAR(254),
+    arg3              VARCHAR(254),
+    caller_filename   VARCHAR(254) NOT NULL,
+    caller_class      VARCHAR(254) NOT NULL,
+    caller_method     VARCHAR(254) NOT NULL,
+    caller_line       CHAR(4) NOT NULL,
+    event_id          NUMBER(10) PRIMARY KEY
   );
+
 
 -- the / suffix may or may not be needed depending on your SQL Client
 -- Some SQL Clients, e.g. SQuirrel SQL has trouble with the following
 -- trigger creation command, while SQLPlus (the basic SQL Client which
 -- ships with Oracle) has no trouble at all.
 
-CREATE TRIGGER access_event_id_seq_trig
-  BEFORE INSERT ON access_event
+CREATE TRIGGER logging_event_id_seq_trig
+  BEFORE INSERT ON logging_event
   FOR EACH ROW  
   BEGIN  
-    SELECT access_event_id_seq.NEXTVAL 
+    SELECT logging_event_id_seq.NEXTVAL 
     INTO   :NEW.event_id 
     FROM   DUAL;  
-  END access_event_id_seq_trig;
+  END;
 /
 
-CREATE TABLE access_event_header
+
+CREATE TABLE logging_event_property
   (
-    event_id	      NUMBER(20) NOT NULL,
-    header_key        VARCHAR2(254) NOT NULL,
-    header_value      VARCHAR2(1024),
-    PRIMARY KEY(event_id, header_key),
-    FOREIGN KEY (event_id) REFERENCES access_event(event_id)
+    event_id	      NUMBER(10) NOT NULL,
+    mapped_key        VARCHAR2(254) NOT NULL,
+    mapped_value      VARCHAR2(1024),
+    PRIMARY KEY(event_id, mapped_key),
+    FOREIGN KEY (event_id) REFERENCES logging_event(event_id)
+  );
+  
+CREATE TABLE logging_event_exception
+  (
+    event_id         NUMBER(10) NOT NULL,
+    i                SMALLINT NOT NULL,
+    trace_line       VARCHAR2(254) NOT NULL,
+    PRIMARY KEY(event_id, i),
+    FOREIGN KEY (event_id) REFERENCES logging_event(event_id)
   );
   
 
