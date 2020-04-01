@@ -88,46 +88,46 @@ logback 用于日志记录，可以将日志输出到控制台、文件、数据
 logack 天然的支持 slf4j，不需要像其他日志框架一样引入适配层（如 log4j 需引入 slf4j-log4j12 ）。通过后面的源码分析可知，logback 只是将适配相关代码放入了 logback-classic。
 
 ```xml
-	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.12</version>
-			<scope>test</scope>
-		</dependency>
-		<!-- logback+slf4j -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.7.28</version>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-core</artifactId>
-			<version>1.2.3</version>
-			<type>jar</type>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>1.2.3</version>
-			<type>jar</type>
-		</dependency>
-		<!-- 输出日志到数据库时需要用到 -->
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>8.0.17</version>
-		</dependency>
-		<!-- 使用数据源方式输出日志到数据库时需要用到 -->
-		<dependency>
-			<groupId>com.mchange</groupId>
-			<artifactId>c3p0</artifactId>
-			<version>0.9.5.4</version>
-		</dependency>
-	</dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- logback+slf4j -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.28</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>1.2.3</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.3</version>
+            <type>jar</type>
+        </dependency>
+        <!-- 输出日志到数据库时需要用到 -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.17</version>
+        </dependency>
+        <!-- 使用数据源方式输出日志到数据库时需要用到 -->
+        <dependency>
+            <groupId>com.mchange</groupId>
+            <artifactId>c3p0</artifactId>
+            <version>0.9.5.4</version>
+        </dependency>
+    </dependencies>
 ```
 
 ## 将日志输出到控制台
@@ -140,17 +140,17 @@ logack 天然的支持 slf4j，不需要像其他日志框架一样引入适配�
 
 ```xml
 <configuration>
-	<!-- 控制台输出 -->
-	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <!-- 控制台输出 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <!--定义控制台输出格式-->
         <encoder charset="utf-8">
-			<pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n</pattern>
         </encoder>
-	</appender>
+    </appender>
     
-	<root level="info">
-		<appender-ref ref="STDOUT" />
-	</root>
+    <root level="info">
+        <appender-ref ref="STDOUT" />
+    </root>
 </configuration>
 ```
 
@@ -163,16 +163,16 @@ logack 天然的支持 slf4j，不需要像其他日志框架一样引入适配�
 以下代码中，导入的两个类 `Logger` 、 `LoggerFactory`都定义在 slf4j-api 中，完全不会涉及到 logback 包的类。这时，如果我们想切换 log4j 作为日志支持，只要修改 pom.xml 和日志配置文件就行，项目代码并不需要改动。源码分析部分将分析 slf4j 如何实现门面模式。
 
 ```java
-	@Test
-	public void test01() {
-		Logger logger = LoggerFactory.getLogger(LogbackTest.class);
-		
-		logger.debug("输出DEBUG级别日志");
-		logger.info("输出INFO级别日志");
-		logger.warn("输出WARN级别日志");
-		logger.error("输出ERROR级别日志");
-		
-	}
+    @Test
+    public void test01() {
+        Logger logger = LoggerFactory.getLogger(LogbackTest.class);
+        
+        logger.debug("输出DEBUG级别日志");
+        logger.info("输出INFO级别日志");
+        logger.warn("输出WARN级别日志");
+        logger.error("输出ERROR级别日志");
+        
+    }
 ```
 
 注意，这里获取的 logger 不是我们配置的 root logger，而是**以 cn.zzs.logback.LogbackTest 命名的 logger，它继承了祖先 root logger 的配置**。
@@ -209,8 +209,8 @@ ALL < TRACE < DEBUG < INFO < WARN < ERROR < OFF
     <!-- 定义变量 -->
     <property name="LOG_HOME" value="D:/growUp/test/log" />
     <property name="APP_NAME" value="logback-demo"/>
-	
-	<!-- 滚动文件输出 -->
+    
+    <!-- 滚动文件输出 -->
     <appender name="FILE-ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!-- 指定日志文件的名称 -->
         <file>${LOG_HOME}/${APP_NAME}/error.log</file>
@@ -218,7 +218,7 @@ ALL < TRACE < DEBUG < INFO < WARN < ERROR < OFF
         <!-- 配置追加写入 -->
         <append>true</append>    
         
-       	<!-- 级别过滤器 -->
+           <!-- 级别过滤器 -->
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>ERROR</level>
             <onMatch>ACCEPT</onMatch>
@@ -244,9 +244,9 @@ ALL < TRACE < DEBUG < INFO < WARN < ERROR < OFF
         </encoder>
     </appender>
 
-	<root level="info">
-		<appender-ref ref="FILE" />
-	</root>
+    <root level="info">
+        <appender-ref ref="FILE" />
+    </root>
 </configuration>
 ```
 
@@ -305,7 +305,7 @@ COMMIT;
 BEGIN;
 CREATE TABLE logging_event_property
   (
-    event_id	      BIGINT NOT NULL,
+    event_id          BIGINT NOT NULL,
     mapped_key        VARCHAR(254) NOT NULL,
     mapped_value      TEXT,
     PRIMARY KEY(event_id, mapped_key),
@@ -338,25 +338,25 @@ logback 支持使用 DataSourceConnectionSource，DriverManagerConnectionSource 
 ```xml
 <configuration>
 
-	<!--数据库输出-->
-	<appender name="DB" class="ch.qos.logback.classic.db.DBAppender">
-		<!-- 使用jdbc方式 -->
-		<!-- <connectionSource class="ch.qos.logback.core.db.DriverManagerConnectionSource">
-			<driverClass>com.mysql.cj.jdbc.Driver</driverClass>
-			<url>jdbc:mysql://localhost:3306/github_demo?useUnicode=true&amp;characterEncoding=utf8&amp;serverTimezone=GMT%2B8&amp;useSSL=true</url>
-			<user>root</user>
-			<password>root</password>
-		</connectionSource> -->
-		<!-- 使用数据源方式 -->
-		<connectionSource class="ch.qos.logback.core.db.DataSourceConnectionSource">
-	       <dataSource class="com.mchange.v2.c3p0.ComboPooledDataSource">
-	       </dataSource>
-		</connectionSource>
-	</appender>
-    	
-	<root level="info">
-		<appender-ref ref="DB" />
-	</root>
+    <!--数据库输出-->
+    <appender name="DB" class="ch.qos.logback.classic.db.DBAppender">
+        <!-- 使用jdbc方式 -->
+        <!-- <connectionSource class="ch.qos.logback.core.db.DriverManagerConnectionSource">
+            <driverClass>com.mysql.cj.jdbc.Driver</driverClass>
+            <url>jdbc:mysql://localhost:3306/github_demo?useUnicode=true&amp;characterEncoding=utf8&amp;serverTimezone=GMT%2B8&amp;useSSL=true</url>
+            <user>root</user>
+            <password>root</password>
+        </connectionSource> -->
+        <!-- 使用数据源方式 -->
+        <connectionSource class="ch.qos.logback.core.db.DataSourceConnectionSource">
+           <dataSource class="com.mchange.v2.c3p0.ComboPooledDataSource">
+           </dataSource>
+        </connectionSource>
+    </appender>
+        
+    <root level="info">
+        <appender-ref ref="DB" />
+    </root>
 </configuration>
 ````
 
@@ -468,16 +468,16 @@ configuration 主要用于配置某些全局的日志行为，常见的配置参
 ```xml
 <configuration debug="true" scan="true" scanPeriod="60 seconds" >
     
-	<!-- 控制台输出 -->
-	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-	   <target>system.err</target>   
+    <!-- 控制台输出 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+       <target>system.err</target>   
         <encoder charset="utf-8">
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
         </encoder>
-	</appender>
-	<root level="info">
-		<appender-ref ref="STDOUT" />
-	</root>
+    </appender>
+    <root level="info">
+        <appender-ref ref="STDOUT" />
+    </root>
 </configuration>
 ```
 
@@ -501,12 +501,12 @@ configuration 主要用于配置某些全局的日志行为，常见的配置参
 在以下代码中，我们可以在`getLogger`方法中传入的是当前类的 Class 对象或全限定类名，本质上获取到的都是一个 logger 对象（如果该 logger 不存在，才会创建）。
 
 ```java
-	@Test
-	public void test01() {
+    @Test
+    public void test01() {
         Logger logger1 = LoggerFactory.getLogger(LogbackTest.class);
         Logger logger2 = LoggerFactory.getLogger("cn.zzs.logback.LogbackTest");
         System.err.println(logger == logger2);// true
-	}
+    }
 ```
 
 这里补充一个问题，该 logger 对象以 cn.zzs.logback.LogbackTest 命名，和我们配置文件中定义的 root logger 并不是同一个，但是为什么这个 logger 对象却拥有 root logger 的行为？
@@ -572,9 +572,9 @@ configuration 主要用于配置某些全局的日志行为，常见的配置参
 实际项目中，如果不希望继承父级的 appender，可以配置 additivity="false" ，如下：
 
 ```xml
-	<logger name="cn.zzs" additivity="false">
+    <logger name="cn.zzs" additivity="false">
        <appender-ref ref="FILE" />
-	</logger>
+    </logger>
 ```
 
 注意，因为以下配置都是建立在 logger 的继承关系上，所以这部分内容必须很好地理解。
@@ -609,7 +609,7 @@ ConsoleAppender 支持将日志通过 *System.out* 或者 *System.err* 输出，
 具体配置如下：
 
 ```xml
-	<!-- 控制台输出 -->
+    <!-- 控制台输出 -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     
        <target>system.err</target>
@@ -635,7 +635,7 @@ FileAppender 支持将日志输出到文件中，常用属性如下：
 具体配置如下：
 
 ```xml
-	<!-- 定义变量 -->
+    <!-- 定义变量 -->
     <property scope="system" name="LOG_HOME" value="D:/growUp/test/logs" />
     <property scope="system" name="APP_NAME" value="logback-demo"/>
     <property scope="system" name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"/>
@@ -647,7 +647,7 @@ FileAppender 支持将日志输出到文件中，常用属性如下：
         <encoder>
             <pattern>${LOG_PATTERN}</pattern>
         </encoder>
-	</appender>
+    </appender>
 ```
 
 ### RollingFileAppender
@@ -669,10 +669,10 @@ RollingFileAppender 的属性如下所示：
 具体配置如下：
 
 ```xml
-	<!-- 定义变量 -->
+    <!-- 定义变量 -->
     <property scope="system" name="LOG_HOME" value="D:/growUp/test/logs" />
     <property scope="system" name="APP_NAME" value="logback-demo"/>
-    <property scope="system" name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"/>	
+    <property scope="system" name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"/>    
     <!-- 轮转文件输出 -->
     <appender name="FILE-ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
         
@@ -728,7 +728,7 @@ RollingFileAppender 的属性如下所示：
 注意，在拼接 pattren 时，应该考虑使用“有意义的”转换字符，避免产生不必要的性能开销。具体配置如下：
 
 ```xml
-	<!-- 控制台输出 -->
+    <!-- 控制台输出 -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
        
         <encoder charset="utf-8">
@@ -801,9 +801,9 @@ ThresholdFilter 基于给定的临界值来过滤事件。如果事件的级别�
         </encoder>
         
         <!-- 设置过滤器 -->
-	    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-	      <level>ERROR</level>
-	    </filter>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+          <level>ERROR</level>
+        </filter>
     </appender>
     
     <root level="info">
@@ -859,12 +859,12 @@ ThresholdFilter 基于给定的临界值来过滤事件。如果事件的级别�
 注意，使用 GEventEvaluator 必须引入 groovy 的 jar 包：
 
 ```xml
-		<!-- groovy -->
-		<dependency>
-		    <groupId>org.codehaus.groovy</groupId>
-		    <artifactId>groovy</artifactId>
-		    <version>3.0.0-rc-3</version>
-		</dependency>
+        <!-- groovy -->
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy</artifactId>
+            <version>3.0.0-rc-3</version>
+        </dependency>
 ```
 
 运行测试方法，输出如下结果：
@@ -889,13 +889,13 @@ EvaluatorFilter  除了支持 Groovy 表达式，还支持使用 java 代码来�
         </encoder>
         
         <!-- 设置过滤器 -->
-	    <filter class="ch.qos.logback.core.filter.EvaluatorFilter">      
-	      <evaluator> <!-- defaults to type ch.qos.logback.classic.boolex.JaninoEventEvaluator -->
-	        <expression>return message.contains("ERROR");</expression>
-	      </evaluator>
-	      <OnMismatch>DENY</OnMismatch>
-	      <OnMatch>NEUTRAL</OnMatch>
-	    </filter>
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">      
+          <evaluator> <!-- defaults to type ch.qos.logback.classic.boolex.JaninoEventEvaluator -->
+            <expression>return message.contains("ERROR");</expression>
+          </evaluator>
+          <OnMismatch>DENY</OnMismatch>
+          <OnMatch>NEUTRAL</OnMatch>
+        </filter>
     </appender>
     
     <root level="info">
@@ -907,12 +907,12 @@ EvaluatorFilter  除了支持 Groovy 表达式，还支持使用 java 代码来�
 注意，使用 JaninoEventEvaluator 必须导入 janino 包，如下：
 
 ```xml
-		<!-- janino -->
-		<dependency>
-		    <groupId>org.codehaus.janino</groupId>
-		    <artifactId>janino</artifactId>
-		    <version>3.1.0</version>
-		</dependency>
+        <!-- janino -->
+        <dependency>
+            <groupId>org.codehaus.janino</groupId>
+            <artifactId>janino</artifactId>
+            <version>3.1.0</version>
+        </dependency>
 ```
 
 运行测试方法，输出如下结果：
@@ -973,9 +973,9 @@ Logger logger = LoggerFactory.getLogger(LogbackTest.class);
 进入到`getILoggerFactory()`方法，如下。`INITIALIZATION_STATE`代表了初始化状态，该方法会根据初始化状态的不同而返回不同的结果。
 
 ```java
-	static final SubstituteLoggerFactory SUBST_FACTORY = new SubstituteLoggerFactory();
+    static final SubstituteLoggerFactory SUBST_FACTORY = new SubstituteLoggerFactory();
     static final NOPLoggerFactory NOP_FALLBACK_FACTORY = new NOPLoggerFactory(); 
-	public static ILoggerFactory getILoggerFactory() {
+    public static ILoggerFactory getILoggerFactory() {
         // 如果未初始化
         if (INITIALIZATION_STATE == UNINITIALIZED) {
             synchronized (LoggerFactory.class) {
@@ -1113,12 +1113,12 @@ logback 加载配置的代码还是比较繁琐，且代码量较大，这里就
 
 ```java
     private LoggerContext defaultLoggerContext = new LoggerContext();
-	public ILoggerFactory getLoggerFactory() {
+    public ILoggerFactory getLoggerFactory() {
         // 如果初始化未完成，直接返回defaultLoggerContext
         if (!initialized) {
             return defaultLoggerContext;
         }
-		
+        
         if (contextSelectorBinder.getContextSelector() == null) {
             throw new IllegalStateException("contextSelector cannot be null. See also " + NULL_CS_URL);
         }
@@ -1213,7 +1213,7 @@ logback 加载配置的代码还是比较繁琐，且代码量较大，这里就
             throw new IllegalArgumentException("For logger [" + this.name + "] child name [" + childName
                             + " passed as parameter, may not include '.' after index" + (this.name.length() + 1));
         }
-		// 创建子logger集合
+        // 创建子logger集合
         if (childrenList == null) {
             childrenList = new CopyOnWriteArrayList<Logger>();
         }
@@ -1236,14 +1236,14 @@ logback 在类的设计上非常值得学习， 使得许多代码逻辑也非�
 
 ```java
     public static final String FQCN = ch.qos.logback.classic.Logger.class.getName();
-	public void debug(String msg) {
+    public void debug(String msg) {
         filterAndLog_0_Or3Plus(FQCN, null, Level.DEBUG, msg, null, null);
     }
     private void filterAndLog_0_Or3Plus(final String localFQCN, final Marker marker, final Level level, final String msg, final Object[] params,
                     final Throwable t) {
-		// 使用TurboFilter过滤当前日志，判断是否通过
+        // 使用TurboFilter过滤当前日志，判断是否通过
         final FilterReply decision = loggerContext.getTurboFilterChainDecision_0_3OrMore(marker, this, level, msg, params, t);
-		//  返回NEUTRAL表示没有TurboFilter，即无需过滤
+        //  返回NEUTRAL表示没有TurboFilter，即无需过滤
         if (decision == FilterReply.NEUTRAL) {
             // 如果需要打印日志的等级小于有效日志等级，则直接返回
             if (effectiveLevelInt > level.levelInt) {
@@ -1253,7 +1253,7 @@ logback 在类的设计上非常值得学习， 使得许多代码逻辑也非�
             // 如果不通过，则不打印日志，直接返回
             return;
         }
-		// 创建LoggingEvent
+        // 创建LoggingEvent
         buildLoggingEventAndAppend(localFQCN, marker, level, msg, params, t);
     }
 ```
@@ -1311,7 +1311,7 @@ logback 在类的设计上非常值得学习， 使得许多代码逻辑也非�
 继续进入到`AppenderAttachableImpl.appendLoopOnAppenders(E)`，如下。这里会遍历当前 logger 持有的 appender，并调用它们的 doAppend 方法。
 
 ```java
-	public int appendLoopOnAppenders(E e) {
+    public int appendLoopOnAppenders(E e) {
         int size = 0;
         // 获得当前logger的所有appender
         final Appender<E>[] appenderArray = appenderList.asTypedArray();
@@ -1339,7 +1339,7 @@ logback 在类的设计上非常值得学习， 使得许多代码逻辑也非�
         try {
             guard.set(Boolean.TRUE);
 
-			// 过滤当前日志事件是否允许打印
+            // 过滤当前日志事件是否允许打印
             if (getFilterChainDecision(eventObject) == FilterReply.DENY) {
                 return;
             }
@@ -1377,7 +1377,7 @@ logback 在类的设计上非常值得学习， 使得许多代码逻辑也非�
             if (event instanceof DeferredProcessingAware) {
                 ((DeferredProcessingAware) event).prepareForDeferredProcessing();
             }
-			
+            
             // 调用encoder的方法将日志事件转化为字节数组
             byte[] byteArray = this.encoder.encode(event);
             // 打印日志

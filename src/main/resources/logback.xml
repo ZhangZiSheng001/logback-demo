@@ -1,53 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- scan：是否自动扫描配置文件的更改并重新加载，默认值为 false。 
-	scanPeriod：设置扫描配置文件是否有修改的时间间隔，默认的时间间隔为1分钟。
-	debug：是否打印出logback的内部运行状态。默认值为 false。 -->
+<!-- scan：是否自动扫描配置文件的更改并重新加载，默认值为 false。 scanPeriod：设置扫描配置文件是否有修改的时间间隔，默认的时间间隔为1分钟。 debug：是否打印出logback的内部运行状态。默认值为 false。 -->
 <configuration scan="true" scanPeriod="10 seconds" debug="true">
 
     <!-- 开启JMX支持 -->
     <jmxConfigurator />
-    
-	<!-- 定义变量 -->
-	<contextName>logbackTest</contextName>
-	<property scope="system" name="LOG_HOME" value="D:/growUp/test/logs" />
-	<!-- <property name="LOG_HOME" value="${catalina.base}/logs" /> -->
-    <property scope="system" name="APP_NAME" value="logback-demo"/>
-    <property scope="system" name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"/>
-	
-	<!-- 控制台输出 -->
-	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-	
-	   <target>system.err</target>
-	   
+
+    <!-- 定义变量 -->
+    <contextName>logbackTest</contextName>
+    <property scope="system" name="LOG_HOME" value="D:/growUp/test/logs" />
+    <!-- <property name="LOG_HOME" value="${catalina.base}/logs" /> -->
+    <property scope="system" name="APP_NAME" value="logback-demo" />
+    <property scope="system" name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n" />
+
+    <!-- 控制台输出 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+
+        <target>system.err</target>
+
         <encoder charset="utf-8">
             <pattern>${LOG_PATTERN}</pattern>
         </encoder>
-	</appender>
-	
-	
+    </appender>
+
+
     <timestamp key="bySecond" datePattern="yyyy-MM-dd'T'HH-mm-ss" />
     <!-- 文件输出 -->
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
         <file>${LOG_HOME}/${APP_NAME}/file-${bySecond}.log</file>
-        
+
         <encoder>
             <pattern>${LOG_PATTERN}</pattern>
         </encoder>
     </appender>
 
-	<!-- 轮转文件输出 -->
+    <!-- 轮转文件输出 -->
     <appender name="FILE-ERROE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        
+
         <!-- 级别过滤器 -->
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>ERROR</level>
             <onMatch>ACCEPT</onMatch>
             <onMismatch>DENY</onMismatch>
         </filter>
-        
+
         <!-- 轮转策略 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <!-- 按天轮转  -->
+            <!-- 按天轮转 -->
             <fileNamePattern>${LOG_HOME}/${APP_NAME}/log-%d{yyyy-MM-dd}-%i.log</fileNamePattern>
             <!-- 保存 30 天的历史记录，最大大小为 30GB -->
             <MaxHistory>30</MaxHistory>
@@ -55,38 +53,32 @@
             <!-- 当日志文件超过100MB的大小时，根据上面提到的%i进行日志文件轮转 -->
             <maxFileSize>100MB</maxFileSize>
         </rollingPolicy>
-        
-        <!-- 日志输出格式-->
+
+        <!-- 日志输出格式 -->
         <encoder charset="utf-8">
             <pattern>${LOG_PATTERN}</pattern>
         </encoder>
     </appender>
-    	
-	<!--数据库输出-->
-	<appender name="DB" class="ch.qos.logback.classic.db.DBAppender">
-		<!-- 使用jdbc方式 -->
-		<!-- <connectionSource class="ch.qos.logback.core.db.DriverManagerConnectionSource">
-			<driverClass>com.mysql.cj.jdbc.Driver</driverClass>
-			<url>jdbc:mysql://localhost:3306/github_demo?useUnicode=true&amp;characterEncoding=utf8&amp;serverTimezone=GMT%2B8&amp;useSSL=true</url>
-			<user>root</user>
-			<password>root</password>
-		</connectionSource> -->
-		<!-- 使用数据源方式 -->
-		<connectionSource class="ch.qos.logback.core.db.DataSourceConnectionSource">
-	       <dataSource class="com.mchange.v2.c3p0.ComboPooledDataSource"/>
-		</connectionSource>
-	</appender>
 
-	<!-- logger主要用于存放日志对象，也可以定义日志类型、级别 
-			additivity：是否继承父级的appender -->
-	<!-- <logger name="cn.zzs" level="error" additivity="false">
-	</logger> -->
-    	
-    	
-	<root level="info">
-		<appender-ref ref="STDOUT" />
-		<!-- <appender-ref ref="FILE" /> -->
-		<appender-ref ref="FILE-ERROE" />
-		<appender-ref ref="DB" />
-	</root>
+    <!--数据库输出 -->
+    <appender name="DB" class="ch.qos.logback.classic.db.DBAppender">
+        <!-- 使用jdbc方式 -->
+        <!-- <connectionSource class="ch.qos.logback.core.db.DriverManagerConnectionSource"> <driverClass>com.mysql.cj.jdbc.Driver</driverClass> <url>jdbc:mysql://localhost:3306/github_demo?useUnicode=true&amp;characterEncoding=utf8&amp;serverTimezone=GMT%2B8&amp;useSSL=true</url> 
+            <user>root</user> <password>root</password> </connectionSource> -->
+        <!-- 使用数据源方式 -->
+        <connectionSource class="ch.qos.logback.core.db.DataSourceConnectionSource">
+            <dataSource class="com.mchange.v2.c3p0.ComboPooledDataSource" />
+        </connectionSource>
+    </appender>
+
+    <!-- logger主要用于存放日志对象，也可以定义日志类型、级别 additivity：是否继承父级的appender -->
+    <!-- <logger name="cn.zzs" level="error" additivity="false"> </logger> -->
+
+
+    <root level="info">
+        <appender-ref ref="STDOUT" />
+        <!-- <appender-ref ref="FILE" /> -->
+        <appender-ref ref="FILE-ERROE" />
+        <appender-ref ref="DB" />
+    </root>
 </configuration>
