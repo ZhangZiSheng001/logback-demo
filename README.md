@@ -444,7 +444,7 @@ logger.debug("The new entry is {}", entry);
 另外，如果想要自定义配置文件的名字，可以通过系统属性指定：
 
 ```properties
--Dlogback.configurationFile=/path/to/config.xml
+-Dlogging.config=classpath:logback-sit.xml
 ```
 
 如果没有加载到配置，logback 会调用 BasicConfigurator 进行默认的配置。
